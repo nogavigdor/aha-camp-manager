@@ -25,14 +25,3 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
- add_filter('the_content', 'add_a_line_to_end_of_post');
-
- function add_a_line_to_end_of_post($content) {
-
-    if (is_page() && is_main_query()) {
-        return $content.'<p>Howdy from Noga</>';
-    }
-
-    return $content;
-    }
-   
