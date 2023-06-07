@@ -47,7 +47,7 @@
     }
 
     function parent_details() {
-      
+        echo 'This is the parent details section.';
     }
 
     function parentFirstNameHTML() {
@@ -73,7 +73,6 @@
         //forth parameter: the name of the slug
         //fifth parameter: the function that will create the content for these settings page
         //Sixth parameter: the item position in the menu - in this case first position
-
         add_menu_page(
             'Aha Camp Manager',
             'AHA Manager  ',
@@ -84,7 +83,22 @@
             2
         );
 
-        
+        add_submenu_page(
+            'aha-camps', //The parent slug
+            'Players', 
+            'Players',
+            'manage_options',
+            'players',
+            array($this,'players_settings_page')
+        );
+        add_submenu_page(
+            'aha-camps',//The parent slug
+            'Parents',
+            'Parents',
+            'manage_options',
+            'parents',
+            array($this,'parents_settings_page')
+        );
         add_submenu_page(
             'aha-camps',//The parent slug
             'Mailchimp Tags',
@@ -95,7 +109,13 @@
         );
     }
 
+    function players_settings_page(){
 
+    }
+
+    function parents_settings_page(){
+        
+    }
 
     function mailchimp_tags_settings_page(){
         // Get the saved tag associations
