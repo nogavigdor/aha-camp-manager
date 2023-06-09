@@ -25,6 +25,8 @@
 
         add_action('wpcf7_before_send_mail', array($this, 'send_tags_to_mailchimp'), 10, 1);
 
+       add_action('wpcf7_mail_sent', array($this, 'create_custom_posts_from_cf7_submission'));
+
     
     
         }
@@ -258,9 +260,155 @@ public function send_tags_to_mailchimp($contact_form) {
     }
 }
 
+function create_custom_posts_from_cf7_submission($contact_form) {
+    // Get the form ID from the submitted contact form
+    $cf7_form_id = $contact_form->id();
+    
+    // Get the form data from CF7
+    $submission = WPCF7_Submission::get_instance();
+    if ($submission) {
+        $posted_data = $submission->get_posted_data();
+        
+        // Create the parent custom post type
+        $parent_post_id = wp_insert_post(array(
+            'post_title'   => $posted_data['name-parent-private'] . ' ' . $posted_data['name-parent-last'],
+            'post_type'    => 'foraelder', // Replace with your parent custom post type slug
+            'post_status'  => 'publish',
+        ));
+     
+        
+        // Update the parent custom post type with the submitted form data
+        update_field('telefon', $posted_data['tel-parent'], $parent_post_id); 
+        update_field('telefon_additional', $posted_data['tel-additional'], $parent_post_id); 
+        update_field('foraelders_email', $posted_data['email-parent'], $parent_post_id); 
+        update_field('foraelders_email', $posted_data['email-parent'], $parent_post_id); 
+        update_field('address', $posted_data['address'], $parent_post_id); 
+        update_field('optional_details', $posted_data['optional-details'], $parent_post_id); 
+        update_field('postal_code', $posted_data['postal-code'], $parent_post_id); 
+        update_field('delivery_pickup', $posted_data['delivery-pickup'], $parent_post_id); 
+        
+        if (isset($_POST['delivery-pickup']) && $_POST['delivery-pickup'] === 'Levering') {
+            update_field('address_delivery', $posted_data['address-delivery'], $parent_post_id); 
+            update_field('optional_details_delivery', $posted_data['optional-details-delivery'], $parent_post_id); 
+            update_field('postal_code_delivery', $posted_data['postal-code-delivery'], $parent_post_id); 
+        }
+
+
+        // Store the created spiller post IDs
+         $spiller_post_ids = array();
+    
+        
+        //Prior to updating check how many children where chosend and player's posts according to this number
+        // Check if the 'number_of_children' field exists in the form
+        if (isset($_POST['number-of-children'])) {
+        
+            
+            $numberOfChildren = intval($_POST['number-of-children']);
+
+
+            // Create the player 1 custom post type
+            function createChild1($posted_data, $parent_post_id){
+                $player_post_id = wp_insert_post(array(
+                    'post_title'   => $posted_data['child1-first-name'] . ' ' . $posted_data['child1-last-name'], // Replace with the field name for player name
+                    'post_type'    => 'spiller', // Replace with your player custom post type slug
+                    'post_status'  => 'publish',
+                ));
+
+                //Update the player custom post type with the submitted form data
+
+                update_field('gender', $posted_data['child1-radio-gender'], $player_post_id); 
+                update_field('birthday', $posted_data['child1-date'], $player_post_id); 
+                update_field('shirt_size', $posted_data['child1-shirt-size'], $player_post_id); 
+                update_field('shorts_size', $posted_data['child1-shorts-size'], $player_post_id); 
+                update_field('socks_size', $posted_data['child1-socks-size'], $player_post_id); 
+                update_field('benskinner_size', $posted_data['child1-benskinner-size'], $player_post_id); 
+                update_field('comments', $posted_data['child1-comments'], $player_post_id); 
+
+                 // Update the player custom post type with the parent post ID
+                 update_field('foraelder', $parent_post_id, $player_post_id);
+                
+                  // Store the created spiller post ID
+                  $spiller_post_ids[] = $player_post_id;
+            }
+             // Create the player 1 custom post type
+            function createChild2($posted_data, $parent_post_id){
+                    $player_post_id = wp_insert_post(array(
+                        'post_title'   => $posted_data['child2-first-name'] . ' ' . $posted_data['child2-last-name'], // Replace with the field name for player name
+                        'post_type'    => 'spiller', // Replace with your player custom post type slug
+                        'post_status'  => 'publish',
+                    ));
+                 //Update the player custom post type with the submitted form data
+                 update_field('gender', $posted_data['child2-radio-gender'], $player_post_id); 
+                 update_field('birthday', $posted_data['child2-date'], $player_post_id); 
+                 update_field('shirt_size', $posted_data['child2-shirt-size'], $player_post_id); 
+                 update_field('shorts_size', $posted_data['child2-shorts-size'], $player_post_id); 
+                 update_field('socks_size', $posted_data['child2-socks-size'], $player_post_id); 
+                 update_field('benskinner_size', $posted_data['child2-benskinner-size'], $player_post_id); 
+                 update_field('comments', $posted_data['child2-comments'], $player_post_id); 
+
+                  // Update the player custom post type with the parent post ID
+                 update_field('foraelder', $parent_post_id, $player_post_id);
+                // Store the created spiller post ID
+                $spiller_post_ids[] = $player_post_id;
+            }
+             // Create the player 1 custom post type
+            function createChild3($posted_data, $parent_post_id){
+                    $player_post_id = wp_insert_post(array(
+                        'post_title'   => $posted_data['child3-first-name'] . ' ' . $posted_data['child3-last-name'], // Replace with the field name for player name
+                        'post_type'    => 'spiller', // Replace with your player custom post type slug
+                        'post_status'  => 'publish',
+                    ));
+                //Update the player custom post type with the submitted form data
+                 update_field('gender', $posted_data['child3-radio-gender'], $player_post_id); 
+                 update_field('birthday', $posted_data['child3-date'], $player_post_id); 
+                 update_field('shirt_size', $posted_data['child3-shirt-size'], $player_post_id); 
+                 update_field('shorts_size', $posted_data['child3-shorts-size'], $player_post_id); 
+                 update_field('socks_size', $posted_data['child3-socks-size'], $player_post_id); 
+                 update_field('benskinner_size', $posted_data['child3-benskinner-size'], $player_post_id); 
+                 update_field('comments', $posted_data['child3-comments'], $player_post_id); 
+
+                    
+                 // Update the player custom post type with the parent post ID
+                 update_field('foraelder', $parent_post_id, $player_post_id);
+                // Store the created spiller post ID
+                $spiller_post_ids[] = $player_post_id;
+                
+            }
+            
+            // Perform further actions based on the value of $numberOfChildren
+            
+            if ($numberOfChildren == 1) {
+                // Perform action for 1 child
+                   createChild1($posted_data, $parent_post_id);
+                
+              
+            } elseif ($numberOfChildren == 2) {
+                // Perform action for 2 children
+                createChild1($posted_data, $parent_post_id);
+                createChild2($posted_data, $parent_post_id);
+            } 
+            else {
+                // Perform action for 3 children
+                createChild1($posted_data, $parent_post_id);
+                createChild2($posted_data, $parent_post_id);
+                createChild3($posted_data, $parent_post_id);
+            } 
+
+              // Update the parent custom post type with the spiller post IDs
+                foreach ($spiller_post_ids as $spiller_post_id) {
+                    update_field('linked_children', $spiller_post_id, $parent_post_id);
+                }
+            }
+        
+      
+
+
+
+
+        }
+
     }
-
-
+}
 
     $ahaCampManager=new AhaCampManager();
 
